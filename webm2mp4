@@ -1,0 +1,67 @@
+#!/bin/sh
+
+#==============================================================================
+#Title            :webm2mp4
+#Description      :This script will download a webm and convert to mp4.
+#Usage            :sh webm2mp4 [OPTION] [URL]
+#==============================================================================
+
+usage() {
+	echo "Usage: webm2mp4 [OPTION] [URL]"
+	echo "Try 'webm2mp4 --help' for more information."
+}
+
+menu() {
+	echo "webm2mp4 uses wget and ffmpeg to download a webm and convert to mp4."
+	printf "\nOptional parameters:"
+	printf "\n\t--best\tUse H-265 encoder (default:H-264)\n\n"
+	echo "Usage: webm2mp4 [OPTION] [URL]"
+}
+
+process() {
+	URL=$1
+
+	if [ $1 == "--best" ] ; then 
+		URL=$2
+		BEST=true
+	fi
+	
+	EXTENTION="${URL##*.}"
+
+	if [ $EXTENTION != "webm" ] ; then
+		echo "Video must be WEBM" >&2
+		exit 1
+	fi
+
+	echo "Downloading WEBM"
+
+	DOWNLOAD=$(wget --timeout=20 --tries=1 -nv $URL 2>&1)
+
+	if [[ $DOWNLOAD == *"ERROR"* || $DOWNLOAD == *"unable"* || $DOWNLOAD == *"failed"* ]] ; then
+		echo "Download error:" $DOWNLOAD >&2
+		exit 1
+	fi
+
+	FULLNAME=$(echo $DOWNLOAD | cut -d\" -f2)
+	FILENAME="${FULLNAME%.*}"
+
+	echo "Converting to MP4"
+
+	if [ $BEST ] ; then
+		ffmpeg -hide_banner -loglevel error -nostats -i $FULLNAME -c:v libx265 -x265-params log-level=none -c:a aac -vf scale="trunc(in_w/2)*2:trunc(in_h/2)*2" $FILENAME.mp4
+	else
+		ffmpeg -hide_banner -loglevel error -nostats -i $FULLNAME -c:v libx264 -c:a aac -vf scale="trunc(in_w/2)*2:trunc(in_h/2)*2" $FILENAME.mp4
+	fi
+
+	[ -f "$FILENAME.mp4" ] && echo "Removing temp file"
+
+	rm $FULLNAME
+}
+
+case "$1" in
+	"") usage;;
+	--help) menu;;
+	*) process $1 $2;;
+esac
+
+exit 0

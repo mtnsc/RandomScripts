@@ -1,0 +1,43 @@
+#!/bin/sh
+
+#==============================================================================
+#Title            :dockerclear
+#Description      :This script will stop/remove docker containers and images.
+#Usage            :sh dockerclear [OPTION]
+#==============================================================================
+
+usage () {
+	echo "Usage: dockerclear [OPTION]"
+	echo "Try 'dockerclear --help' for more information."
+}
+
+help () {
+	echo "dockerclear is used to stop/remove docker containers and images."
+	printf "\nOptions:"
+	printf "\n\t--stop, --s\tStop running containers"
+	printf "\n\t--remove, --r\tRemove exited containers"
+	printf "\n\t--clear, --c\tRemove images"
+	printf "\n\t--all, --a\tExecute all other options\n\n"
+	echo "Usage: dockerclear [OPTION]"
+}
+
+stop () {
+	[ -z "$(docker ps -q)" ] || docker stop $(docker ps -q)
+}
+
+rm () {
+	[ -z "$(docker ps -f "status=exited" -q)" ] || docker rm $(docker ps -aq)
+}
+
+clear () {
+	[ -z "$(docker images -q)" ] || docker rmi $(docker images -q)
+}
+
+case "$1" in
+	--stop|--s) stop;;
+	--remove|--r) rm;;
+	--clear|--c) clear;;
+	--all|--a) stop; rm; clear;;
+	--help) help;;
+	*) usage;;
+esac
