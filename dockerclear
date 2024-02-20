@@ -6,12 +6,12 @@
 #Usage            :sh dockerclear [OPTION]
 #==============================================================================
 
-usage () {
+usage() {
 	echo "Usage: dockerclear [OPTION]"
 	echo "Try 'dockerclear --help' for more information."
 }
 
-help () {
+help() {
 	echo "dockerclear is used to stop/remove docker containers and images."
 	printf "\nOptions:"
 	printf "\n\t--stop, --s\tStop running containers"
@@ -21,23 +21,23 @@ help () {
 	echo "Usage: dockerclear [OPTION]"
 }
 
-stop () {
+stop() {
 	[ -z "$(docker ps -q)" ] || docker stop $(docker ps -q)
 }
 
-rm () {
+rm() {
 	[ -z "$(docker ps -f "status=exited" -q)" ] || docker rm $(docker ps -aq)
 }
 
-clear () {
+clear() {
 	[ -z "$(docker images -q)" ] || docker rmi $(docker images -q)
 }
 
 case "$1" in
+	*) usage;;
+	--help) help;;
 	--stop|--s) stop;;
 	--remove|--r) rm;;
 	--clear|--c) clear;;
 	--all|--a) stop; rm; clear;;
-	--help) help;;
-	*) usage;;
 esac

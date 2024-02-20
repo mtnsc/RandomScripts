@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#===================================================================================================
+#Title            :reposearch
+#Description      :This script will recursively search inside files while ignoring useless folders.
+#Usage            :sh reposearch [PATTERN]
+#===================================================================================================
+
+usage() {
+	echo "Usage: reposearch [PATTERN]"
+	echo "Try 'reposearch --help' for more information."
+}
+
+help() {
+	echo "reposearch is used to recursively search inside files while ignoring useless folders."
+	echo "Usage: reposearch [PATTERN]"
+}
+
+case "$1" in
+    "") usage;;
+	--help) help;;
+	*) grep -Rnw '.' -e $1 --exclude-dir node_modules;;
+esac
