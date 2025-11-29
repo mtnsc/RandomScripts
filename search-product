@@ -1,0 +1,34 @@
+#!/bin/sh
+
+usage() {
+	echo "Usage: search-product [OPTION]"
+	echo "Try 'search-product --help' for more information."
+}
+
+help() {
+	echo "search-product is used to extract all Apigee's products associated to a specific proxy."
+	printf "\nOptions:"
+	printf "\n\t--quiet, -q\tShows only the products' name"
+	echo "Usage: search-product [OPTION]"
+}
+
+run() {
+	read -p "Organization: " ORG
+	[ -z "$APIGEE_USERNAME" ] && read -p "User: " APIGEE_USERNAME
+	[ -z "$APIGEE_PASSWORD" ] && read -sp "Password: " APIGEE_PASSWORD
+	BASE64=$(echo -n "$APIGEE_USERNAME:$APIGEE_PASSWORD" | base64)
+	echo ""
+	read -p "Proxy name: " PROXY
+
+	RESPONSE=$(curl -sb --location --request GET "https://api.enterprise.apigee.com/v1/organizations/$ORG/apiproducts?expand=true" \
+	--header "Authorization: Basic $BASE64")
+	VALID=$(echo $RESPONSE | grep -w "{")
+	[ -z "$VALID" ] && echo $RESPONSE || echo $RESPONSE | jq ".apiProduct[] | select(.proxies | index(\"$PROXY\")) | $FILTRO"
+}
+
+case "$1" in
+	--help|-h) help;;
+	--quiet|-q) FILTRO=".name" run;;
+	"") FILTRO="del(.scopes,.quota,.quotaTimeUnit,.quotaInterval,.lastModifiedBy,.lastModifiedAt,.apiResources,.approvalType,.attributes,.createdAt,.description,.createdBy,.name)" run;; 
+	*) usage;;
+esac

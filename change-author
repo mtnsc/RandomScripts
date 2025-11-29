@@ -1,0 +1,44 @@
+#!/bin/sh
+
+usage() {
+	echo "Usage: change-author"
+	echo "Try 'change-author --help' for more information."
+}
+
+help() {
+	echo "change-author is used to replace the author's name and email in a git repository's history."
+	echo "Usage: change-author"
+}
+
+run() {
+    [ -z "$ACTUAL_USER" ]  && read -p "Actual user: " ACTUAL_USER
+    [ -z "$ACTUAL_EMAIL" ] && read -p "Actual email: " ACTUAL_EMAIL
+    [ -z "$NEW_USER" ]     && read -p "New user: " NEW_USER
+    [ -z "$NEW_EMAIL" ]    && read -p "New email: " NEW_EMAIL
+
+    export ACTUAL_USER
+    export ACTUAL_EMAIL
+    export NEW_USER
+    export NEW_EMAIL
+
+    git filter-branch --env-filter '
+    if [ "$GIT_AUTHOR_NAME" = "$ACTUAL_USER" ]; then
+        export GIT_AUTHOR_NAME="$NEW_USER"
+    fi
+    if [ "$GIT_COMMITTER_NAME" = "$ACTUAL_USER" ]; then
+        export GIT_COMMITTER_NAME="$NEW_USER"
+    fi
+    if [ "$GIT_COMMITTER_EMAIL" = "$ACTUAL_EMAIL" ]; then
+        export GIT_COMMITTER_EMAIL="$NEW_EMAIL"
+    fi
+    if [ "$GIT_AUTHOR_EMAIL" = "$ACTUAL_EMAIL" ]; then
+        export GIT_AUTHOR_EMAIL="$NEW_EMAIL"
+    fi
+    ' --tag-name-filter cat -- --branches --tags
+}
+
+case "$1" in
+	--help|-h) help;;
+	"") run;;
+	*) usage;;
+esac

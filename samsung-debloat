@@ -1,10 +1,10 @@
 #!/bin/bash
 
 help() {
-	echo "samsungdebloat uses adb to remove useless apps and services that come pre-installed on Samsung phones."
-	printf "\nOptional parameters:"
+	echo "samsung-debloat uses adb to remove useless apps and services that come pre-installed on Samsung phones."
+	printf "\nOptions:"
 	printf "\n\t--undo, -u\tReinstall removed apps\n\n"
-    echo "Usage: samsungdebloat [OPTION]"
+    echo "Usage: samsung-debloat [OPTION]"
 }
 
 run() {
@@ -23,6 +23,6 @@ run() {
 }
 
 case "$1" in
-	--help) help;;
+	--help|-h) help;;
 	*|--undo|-u) run $1;;
 esac

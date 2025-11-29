@@ -1,0 +1,17 @@
+#!/bin/sh
+
+usage() {
+	echo "Usage: repo-search [PATTERN]"
+	echo "Try 'repo-search --help' for more information."
+}
+
+help() {
+	echo "repo-search is used to recursively search inside files while ignoring useless folders."
+	echo "Usage: repo-search [PATTERN]"
+}
+
+case "$1" in
+    "") usage;;
+	--help) help;;
+	*) grep -Rnw '.' -e $1 --exclude-dir node_modules;;
+esac

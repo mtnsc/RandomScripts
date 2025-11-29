@@ -1,18 +1,18 @@
 #!/bin/sh
 
 usage() {
-	echo "Usage: dockerclear [OPTION]"
-	echo "Try 'dockerclear --help' for more information."
+	echo "Usage: docker-clear [OPTION]"
+	echo "Try 'docker-clear --help' for more information."
 }
 
 help() {
-	echo "dockerclear is used to stop/remove docker containers and images."
+	echo "docker-clear is used to stop/remove docker containers and images."
 	printf "\nOptions:"
 	printf "\n\t--stop, -s\tStop running containers"
 	printf "\n\t--remove, -r\tRemove exited containers"
 	printf "\n\t--clear, -c\tRemove images"
 	printf "\n\t--all, -a\tExecute all other options\n\n"
-	echo "Usage: dockerclear [OPTION]"
+	echo "Usage: docker-clear [OPTION]"
 }
 
 check() {
